@@ -1,6 +1,6 @@
 ---
 title: "MATH 216 Homework 2"
-author: "WRITE YOUR NAME HERE"
+author: "Shannia Fu"
 output:
   html_document:
     toc: true
@@ -13,6 +13,11 @@ output:
 library(ggplot2)
 library(dplyr)
 library(readr) 
+library(forcats)
+url <- "https://github.com/rudeboybert/JSE_OkCupid/blob/master/profiles.csv.zip?raw=true"
+temp_zip_file <- tempfile()
+download.file(url, temp_zip_file)
+unzip(temp_zip_file, "profiles.csv")
 ```
 
 
@@ -30,9 +35,9 @@ profiles <- read_csv(file="profiles.csv")
 Please indicate
 
 * Who you collaborated with:
-* Roughly how much time you spent on this HW so far:
-* The URL of the RPubs published URL [here](https://www.nhl.com/).
-* What gave you the most trouble:
+* Roughly how much time you spent on this HW so far: 2 hours
+* The URL of the RPubs published URL [here](http://rpubs.com/shannia/hw2).
+* What gave you the most trouble: reordering things, wrapping labels on the x-axis
 * Any comments you have:
 
 
@@ -50,7 +55,29 @@ all keeping in mind in HW-3, you will be fitting a logistic regression to
 predict a user's gender based on these variables.
 
 ```{r, echo=TRUE, message=TRUE, warning=TRUE, fig.width=8, fig.height=4.5}
-
+#income
+income_relation <- profiles %>% 
+  filter(income > 1 & income <= 500000) 
+ggplot (income_relation, aes(x=sex, y=income)) + geom_boxplot()
+#job
+job_relation <- profiles %>% 
+  mutate(job = ifelse(is.na(job), "NA", job))
+ggplot(job_relation, aes(sex, fill=factor(job))) +
+  geom_bar(position="dodge") +
+  labs(title="Number of Jobs by Gender", x="Job", y="Count", fill="Sex")
+#code that graphs by job and separates by sex
+#I tried using this but making the labels wrap was extremely difficultsion 
+#ggplot(job_relation, aes(job, fill=factor(sex))) +
+#  geom_bar(position="dodge") +
+#  scale_x_discrete(labels = function(x) lapply(strwrap(x, width = 10, simplify = FALSE), paste, collapse="\n")) +
+#  labs(title="Number of Jobs by Gender", x="Job", y="Count", fill="Sex")
+#drinks
+drinking_relation <- profiles %>% 
+  mutate(drinks=ifelse(is.na(drinks), "NA", drinks))
+drinking_relation$drinks <- factor(drinking_relation$drinks, levels = c("NA", "not at all", "rarely", "often", "socially", "very often", "desperately"))
+ggplot(drinking_relation, aes(drinks, fill=factor(sex))) +
+  geom_bar(position="dodge") +
+  labs(title="Drinking level by Gender", x="Drinking Level", y="Count", fill="Sex")
 ```
 
 
