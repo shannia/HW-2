@@ -69,9 +69,9 @@ income_summary <- profiles %>%
     prop = round(prop, 2)
   )
 income_summary$income <- factor(income_summary$income, levels = c("NA", "20000", "30000", "40000", "50000", "60000", "70000", "80000", "100000", "150000", "250000+"))
-ggplot (income_summary, aes(x=income, y=prop, fill=sex)) +
+ggplot(income_summary, aes(x=income, y=prop, fill=sex)) +
   geom_bar(stat="identity", position="dodge") +
-  labs(x="Income", y="Proportion", fill="Sex") +
+  labs(title="Income by Gender", x="Income", y="Proportion", fill="Sex") +
   coord_flip()
 
 
