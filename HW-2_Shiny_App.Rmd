@@ -44,7 +44,8 @@ renderPlot({
     filter(!is.na(budget) & !is.na(rating)) %>% 
     filter(is_comedy==input$Comedy)
   ggplot(data=more_comedy, aes(x=budget, y=rating)) + 
-    geom_point()
+    geom_point() + 
+    scale_x_log10()
   
 })
 ```

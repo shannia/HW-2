@@ -56,28 +56,85 @@ predict a user's gender based on these variables.
 
 ```{r, echo=TRUE, message=TRUE, warning=TRUE, fig.width=8, fig.height=4.5}
 #income
-income_relation <- profiles %>% 
-  filter(income > 1 & income <= 500000) 
-ggplot (income_relation, aes(x=sex, y=income)) + geom_boxplot()
+income_summary <- profiles %>% 
+  mutate(
+    income=ifelse(income >= 250000, "250000+", income)
+  ) %>% 
+  mutate(income=ifelse(income==-1, "NA", income)) %>% 
+  group_by(sex, income) %>% 
+  summarise(n=n()) %>% 
+  group_by(sex) %>% 
+  mutate(
+    prop = n/sum(n),
+    prop = round(prop, 2)
+  )
+income_summary$income <- factor(income_summary$income, levels = c("NA", "20000", "30000", "40000", "50000", "60000", "70000", "80000", "100000", "150000", "250000+"))
+ggplot (income_summary, aes(x=income, y=prop, fill=sex)) +
+  geom_bar(stat="identity", position="dodge") +
+  labs(x="Income", y="Proportion", fill="Sex") +
+  coord_flip()
+
+
 #job
-job_relation <- profiles %>% 
-  mutate(job = ifelse(is.na(job), "NA", job))
-ggplot(job_relation, aes(sex, fill=factor(job))) +
-  geom_bar(position="dodge") +
-  labs(title="Number of Jobs by Gender", x="Job", y="Count", fill="Sex")
+job_summary <- profiles %>% 
+  mutate(job = ifelse(is.na(job), "NA", job)) %>% 
+  mutate(job = ifelse(
+    job=="NA" | job=="retired" | job=="unemployed" | job=="other" | job=="rather not say",
+    "other / did not report", job
+      )) %>% 
+  mutate(job = ifelse(
+    job=="computer / hardware / software" | job=="science / tech / engineering",
+    "STEM", job
+  )) %>% 
+  mutate(job = ifelse(
+    job=="artistic / musical / writer" | job=="construction / craftsmanship",
+    "creator", job
+  )) %>% 
+  mutate(job = ifelse(
+    job=="banking / financial / real estate" | job=="clerical / administrative" | job=="executive / management" | job=="sales / marketing / biz dev", 
+    "corporate", job
+  )) %>% 
+  mutate(job = ifelse(
+    job=="law / legal services" | job=="political / government",
+    "law", job
+  )) %>% 
+  group_by(sex, job) %>% 
+  summarise(n=n()) %>% 
+  group_by(sex) %>% 
+  mutate(
+    prop = n/sum(n),
+    prop = round(prop, 2)
+  )
 #code that graphs by job and separates by sex
-#I tried using this but making the labels wrap was extremely difficultsion 
-#ggplot(job_relation, aes(job, fill=factor(sex))) +
-#  geom_bar(position="dodge") +
-#  scale_x_discrete(labels = function(x) lapply(strwrap(x, width = 10, simplify = FALSE), paste, collapse="\n")) +
-#  labs(title="Number of Jobs by Gender", x="Job", y="Count", fill="Sex")
-#drinks
-drinking_relation <- profiles %>% 
-  mutate(drinks=ifelse(is.na(drinks), "NA", drinks))
-drinking_relation$drinks <- factor(drinking_relation$drinks, levels = c("NA", "not at all", "rarely", "often", "socially", "very often", "desperately"))
-ggplot(drinking_relation, aes(drinks, fill=factor(sex))) +
-  geom_bar(position="dodge") +
-  labs(title="Drinking level by Gender", x="Drinking Level", y="Count", fill="Sex")
+#I tried using this but making the labels wrap was extremely difficult
+ggplot(job_summary, aes(x=job, y=prop, fill=sex)) +
+ geom_bar(stat="identity", position="dodge") +
+ scale_x_discrete(labels = function(x) lapply(strwrap(x, width = 10, simplify = FALSE), paste, collapse="\n")) +
+ labs(title="Number of Jobs by Gender", x="Job", y="Proportion", fill="Sex") +
+  coord_flip()
+
+#drinking
+drinks_summary <- profiles %>% 
+  mutate(drinks = ifelse(is.na(drinks), "NA", drinks)) %>% 
+  mutate(drinks = ifelse(
+    drinks=="not at all" | drinks=="rarely",
+    "not often", drinks
+  )) %>% 
+  mutate(drinks = ifelse(
+    drinks=="very often" | drinks=="desperately",
+    "often", drinks
+  )) %>% 
+  group_by(sex, drinks) %>% 
+  summarise(n=n()) %>% 
+  group_by(sex) %>% 
+  mutate(
+    prop = n/sum(n),
+    prop = round(prop, 2)
+  )
+drinks_summary$drinks <- factor(drinks_summary$drinks, levels = c("NA", "not often", "socially", "often"))
+ggplot(drinks_summary, aes(x=drinks, y=prop, fill=factor(sex))) +
+  geom_bar(stat="identity", position="dodge") +
+  labs(title="Drinking level by Gender", x="Drinking Level", y="Proportion", fill="Sex")
 ```
 
 
