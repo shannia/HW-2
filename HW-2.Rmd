@@ -35,7 +35,7 @@ profiles <- read_csv(file="profiles.csv")
 Please indicate
 
 * Who you collaborated with:
-* Roughly how much time you spent on this HW so far: 2 hours
+* Roughly how much time you spent on this HW so far: 3.5 hours
 * The URL of the RPubs published URL [here](http://rpubs.com/shannia/hw2).
 * What gave you the most trouble: reordering things, wrapping labels on the x-axis
 * Any comments you have:
